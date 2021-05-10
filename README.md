@@ -82,7 +82,7 @@ Much simpler and much faster!
 Between `clip` and `cbecho`, the bridge between `GUI` and `CLI` software
 is now complete.
 
-> By the way, if you wanted to copy the output of the `dir` command to
+> __A tip:__ If you wanted to copy the output of the `dir` command to
 > the clipboard, but still see it in your command line window, try this,
 >
 > ```
@@ -92,7 +92,7 @@ is now complete.
 ## Using cbecho
 
 In most cases, all you need to do is just type `cbecho` on the command line,
-and if there is any plain text, whether Unicode or ANSI (or other local text)
+and if there is any plain text, whether Unicode or ANSI (or other local text),
 on the clipboard, `cbecho` will send it to `stdout`, from where you can pipe
 it to other programs, or redirect it to a device, etc.
 
@@ -273,6 +273,29 @@ And the `-w` option will `wipe` the clipboard without any output.
 Both `-e` and `-w` will leave the clipboard equally empty. The only difference
 is that `-e` will first check if there is some plain text on the clipboard,
 and if so, it will output it.
+
+> __A tip:__ The `-e` option will empty the clipboard after first checking
+> for text so it can display it if it is present. But it will still empty the
+> clipboard even if it does not find any text on it.
+>
+> What if you wanted to empty the clipboard if and only if there is text on it?
+> Try,
+>
+> ```
+> C:\> cbecho && cbecho -w
+> ```
+>
+> That will check for the clipboard text. If it finds any, it will display it
+> and exit `0`, so the command shell will continue on to the `cbecho -w`, which
+> will wipe the clipboard clean.
+>
+> And what if you wanted to wipe the clipboard only if there is text on it, but
+> without `cbecho` displaying the text? Try,
+>
+> ```
+> C:\> cbecho NUL && cbecho -w
+> ```
+
 
 ### Preferences
 
