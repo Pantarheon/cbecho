@@ -26,6 +26,8 @@ Usage: cbecho [options] [file]
 C:\>
 ```
 
+## GUI vs. CLI
+
 There are two main types of computer programs. One interacts with a user
 through a _graphical user interface_ (`GUI`). The other gets its input
 through a standard input (`stdin`) and sends its output to a standard output
@@ -37,6 +39,8 @@ a device, or some other source. The program neither knows nor cares where it
 comes from. Similarly, the standard output can go to a monitor, a printer,
 a file, a device, wherever. Again, the program neither knows nor cares where
 the output goes.
+
+### Bridging GUI and CLI
 
 Microsoft Windows comes with a `CLI` utility called `clip`, which accepts its
 input from `stdin` and sends its output as plain text to the Windows clipboard.
@@ -75,12 +79,22 @@ C:\> cbecho | program1 | program2 | program3 | clip
 
 Much simpler and much faster!
 
+Between `clip` and `cbecho`, the bridge between `GUI` and `CLI` software
+is now complete.
+
+> By the way, if you wanted to copy the output of the `dir` command to
+> the clipboard, but still see it in your command line window, try this,
+>
+> ```
+> C:\> dir | clip & cbecho
+> ```
+
 ## Using cbecho
 
 In most cases, all you need to do is just type `cbecho` on the command line,
-and if there is any plain text, whether Unicode or ANSI (or other local text),
-`cbecho` will send it to `stdout`, from where you can pipe it to other programs,
-or redirect it to a device, etc.
+and if there is any plain text, whether Unicode or ANSI (or other local text)
+on the clipboard, `cbecho` will send it to `stdout`, from where you can pipe
+it to other programs, or redirect it to a device, etc.
 
 It does, however, offer various options. To see them, just type any of the
 following,
@@ -199,9 +213,24 @@ to `-Xantipa.txt`. In the third case, it will assume you meant `-U`, so it
 will read the Unicode text from the clipboard and write it to `stdout`. In
 the fourth case, it will send its output to the file called `-Universe.txt`.
 
+By the way, as long as you do not tell `cbecho` to empty the clipboard, you
+can chain the command to send its output to several files. Since `cbecho`
+returns `0` (which in command shells means `no error`), chaining with `&&`
+will run the whole chain if there is plain text on the clipboard, but will
+quit after the first `cbecho` exits `1`, meaning there is no plain text on the
+clipboard. For example,
+
+```
+C:\> cbecho file1.txt && cbecho file2.txt && cbecho -e
+```
+
+If there is plain text on the clipboard, this will write it to `file1.txt`,
+then to `file2.txt`, then send it to `stdout` and finally empty the clipboard
+(because of the `-e` switch described somewhat below).
+
 Unlike other operating systems, Windows can treat files as either binary or
 text files. I noticed that if I send the output of `cbecho` to a text file,
-it is a plain non-Unicode file even if the text comes from te clipboard in
+it is a plain non-Unicode file even if the text comes from the clipboard in
 Unicode.
 
 If, on the other hand, I send it to a binary file, the Unicode text remains in
@@ -271,7 +300,7 @@ standing, you can overturn the preferences set by the environment variable
 with command line parameters.
 
 The name of the variable is not case sensitive, but the parameters are (that is
-we can have `-u` and `-U` meaning different things).
+how we can have `-u` and `-U` meaning different things).
 
 ## Installation
 
