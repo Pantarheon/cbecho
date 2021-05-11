@@ -205,7 +205,7 @@ C:\> cbecho myfile.txt
 ```
 
 The `-o` switch is optional there. If, however, `-o` is the _last_ switch on
-the command line, `cbecho` will send this output to `stdout`. But only if it
+the command line, `cbecho` will send its output to `stdout`. But only if it
 is the last. Otherwise it assumes it is followed by a file name, even if it
 starts with a `-`, which is a perfectly valid character in a file name.
 
@@ -249,7 +249,7 @@ it is a plain non-Unicode file even if the text comes from the clipboard in
 Unicode.
 
 If, on the other hand, I send it to a binary file, the Unicode text remains in
-16-bit Unicode, while the ANSI text remains the ANSI text.
+16-bit Unicode, while the ANSI text remains ANSI text.
 
 By default, `cbecho` will treat the file as binary, so Unicode can remain
 Unicode (hopefully). This can also be requested explicitly,
@@ -287,8 +287,8 @@ it to `stdout`. And the `-w` option will `wipe` the clipboard without any
 output.
 
 Both `-e` and `-w` will leave the clipboard equally empty. The only difference
-is that `-e` will first check if there is some plain text on the clipboard,
-and if so, it will output it.
+is that `-e` will first check if there is some plain text on the clipboard
+and, if so, will output it.
 
 > __A tip:__ The `-e` option will empty the clipboard after first checking
 > for plain text so it can display it if present. But it will still empty
