@@ -38,7 +38,21 @@ In `CLI`, the standard input can come from a computer keyboard, or a file, or
 a device, or some other source. The program neither knows nor cares where it
 comes from. Similarly, the standard output can go to a monitor, a printer,
 a file, a device, wherever. Again, the program neither knows nor cares where
-the output goes.
+the output goes. It is even possible to pipe `stdout` of ane `CLI` program
+to `stdin` of another `CLI` program by typing a vertical bar (`|`) between
+their names.
+
+> __A tip:__ Some people talk about `DOS` programs when they actually mean
+> Windows `CLI` programs. This is because the early versions of MS Windows
+> ran on top of `MS DOS` (Microsoft Disk Operating System), and its command
+> line window was designed to run `CLI` software written for `MS DOS`.
+>
+> But for decades now the `CLI` programs written for Windows command line
+> no longer are `MS DOS` programs and should not be called `DOS` programs
+> because most people will assume they are talking about the old 20th Century
+> programs. So unless you want to confuse people, call them comand line
+> programs or `CLI` programs, not `DOS` programs. Only say *`DOS` programs*
+> if you are talking about actual `MS DOS` software.
 
 ### Bridging GUI and CLI
 
@@ -160,12 +174,12 @@ other numeric switches (also the `-U` cancels out the `-b`, as shown next).
 
 Windows allows programs to copy all kinds of data to the clipboard, not just
 plain text. Even with the plain text, it can be Unicode text, ANSI text, or
-just text. By default, `cbecho` first checks if any Unicode text is on the
+simple text. By default, `cbecho` first checks if any Unicode text is on the
 clipboard. Only if it does not find Unicode, will it check for ANSI text and
-just text.
+simple text.
 
 You can instruct `cbecho` to bypass the Unicode text and go straight to looking
-for ANSI text or just text like this,
+for ANSI text or simple text like this,
 
 ```
 C:\> cbecho -b 
@@ -180,8 +194,8 @@ C:\> cbecho -U
 That is the _capital_ leter `U`.
 
 By default, `cbecho` writes its output to `stdout`. You can instruct it to
-write to a file. Assuming the file name is called `myfile.txt`, any of these
-will tell `cbecho` to write to it,
+write to a file instead. Assuming the file name is called `myfile.txt`, any
+of these will tell `cbecho` to write to it,
 
 ```
 C:\> cbecho -o myfile.txt
@@ -252,11 +266,11 @@ C:\> cbecho -a filename.txt
 
 Last but not least, by default `cbecho` leaves the data on the clipboard
 even after reading it. But you can ask it to empty the clipboard after it
-displayed the text (assuming there was some text on the clipboard). You can
-also ask it to wipe the clipboard without even reading it. That is useful when
-some program copied something to the clipboard and left it there long after
-it is needed. Removing the data from the clipboard also frees whatever memory
-was used to hold that data.
+displayed the text (assuming there was some plain text on the clipboard).
+You can also ask it to wipe the clipboard without even reading it. That is
+useful when some program copied something to the clipboard and left it there
+long after it is needed. Removing the data from the clipboard also frees
+whatever memory was used to hold that data.
 
 These three options are,
 
@@ -267,18 +281,20 @@ C:\> cbecho -w
 ```
 
 The `-k` option tells `cbecho` to `keep` the data on the clipboard. The `-e`
-option will `empty` the clipboard after sending any text from it to `stdout`.
-And the `-w` option will `wipe` the clipboard without any output.
+option will `empty` the clipboard after potentially sending any plain text from
+it to `stdout`. And the `-w` option will `wipe` the clipboard without any
+output.
 
 Both `-e` and `-w` will leave the clipboard equally empty. The only difference
 is that `-e` will first check if there is some plain text on the clipboard,
 and if so, it will output it.
 
 > __A tip:__ The `-e` option will empty the clipboard after first checking
-> for text so it can display it if it is present. But it will still empty the
-> clipboard even if it does not find any text on it.
+> for plain text so it can display it if present. But it will still empty
+> the clipboard even if it does not find any plain text on it.
 >
-> What if you wanted to empty the clipboard if and only if there is text on it?
+> What if you wanted to empty the clipboard if and only if there is some
+> plain text on it?
 > Try,
 >
 > ```
@@ -287,10 +303,13 @@ and if so, it will output it.
 >
 > That will check for the clipboard text. If it finds any, it will display it
 > and exit `0`, so the command shell will continue on to the `cbecho -w`, which
-> will wipe the clipboard clean.
+> will wipe the clipboard clean. But if it does _not_ find any plain text, it
+> will exit `1`, so the command line will stop and `cbecho -w` will not be run,
+> so whatever data other than plain text might be on the clipboard will stay
+> there.
 >
-> And what if you wanted to wipe the clipboard only if there is text on it, but
-> without `cbecho` displaying the text? Try,
+> And what if you wanted to wipe the clipboard only if there is some plain
+> text on it, but without `cbecho` displaying the text? Try,
 >
 > ```
 > C:\> cbecho NUL && cbecho -w
