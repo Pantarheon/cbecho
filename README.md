@@ -38,7 +38,7 @@ In `CLI`, the standard input can come from a computer keyboard, or a file, or
 a device, or some other source. The program neither knows nor cares where it
 comes from. Similarly, the standard output can go to a monitor, a printer,
 a file, a device, wherever. Again, the program neither knows nor cares where
-the output goes. It is even possible to pipe `stdout` of ane `CLI` program
+the output goes. It is even possible to pipe `stdout` of one `CLI` program
 to `stdin` of another `CLI` program by typing a vertical bar (`|`) between
 their names.
 
@@ -71,7 +71,7 @@ programs.
 
 Recently, I needed to move in the opposite direction, i.e., to copy a portion
 of text from a text editor and somehow send it to the standard input of a `CLI`
-program, which processed the text and sent it to its standard output.
+program, which processed the text and sent the result to its standard output.
 
 At first I would copy and paste that text to a temp file. I then redirected
 that file to a chain of small `CLI` programs. Something like this:
@@ -84,7 +84,8 @@ Then I could paste the result to my `GUI` editor.
 
 Doing so once is no big deal. Doing so repeatedly is tedious. It is also easy
 to make mistakes. So to bridge the other half of the gap between `CLI` and
-`GUI`, I wrote `cbecho`, which stands for `clipboard echo`. Now I can just
+`GUI`, I wrote `cbecho`, which stands for `clipboard echo`. It sends any plain
+text present in Windows clipboard to its `stdout`. Now I can just
 copy the text, but instead of using a temp file, I type something like this,
 
 ```
@@ -120,7 +121,7 @@ C:\> cbecho --help
 ```
 
 That will list all of its command line switches, just as shown above. If you
-have the `CBECHO` environmental variable set, it will list that as well.
+have the `CBECHO` environment variable set, it will list that as well.
 
 If you just need to know what version of `cbecho` you have, you can type one
 of these two,
@@ -328,7 +329,7 @@ You cannot specify a file name in the environment variable, only the options.
 So, the `o` option will only affirm `stdout` as the output and is, therefore,
 redundant, though you can use it if you want.
 
-There is no need to prepend the options in the environmental variable with
+There is no need to prepend the options in the environment variable with
 a dash. For example, this will result in bypassing Unicode, stripping two
 characters from the end of the text and emptying the clipboard,
 
@@ -348,7 +349,7 @@ how we can have `-u` and `-U` meaning different things).
 
 This is a very simple program entirely contained in the small `cbecho.exe`
 file. No need to install it, no need to uninstall it. Just download it and
-place it in a folder listed in the `PATH` environmental variable. Then you
+place it in a folder listed in the `PATH` environment variable. Then you
 can use it from the command line as well as from batch files.
 
 ## License
