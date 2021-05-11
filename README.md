@@ -213,20 +213,20 @@ to `-Xantipa.txt`. In the third case, it will assume you meant `-U`, so it
 will read the Unicode text from the clipboard and write it to `stdout`. In
 the fourth case, it will send its output to the file called `-Universe.txt`.
 
-By the way, as long as you do not tell `cbecho` to empty the clipboard, you
-can chain the command to send its output to several files. Since `cbecho`
-returns `0` (which in command shells means `no error`), chaining with `&&`
-will run the whole chain if there is plain text on the clipboard, but will
-quit after the first `cbecho` exits `1`, meaning there is no plain text on the
-clipboard. For example,
-
-```
-C:\> cbecho file1.txt && cbecho file2.txt && cbecho -e
-```
-
-If there is plain text on the clipboard, this will write it to `file1.txt`,
-then to `file2.txt`, then send it to `stdout` and finally empty the clipboard
-(because of the `-e` switch described somewhat below).
+> __A tip:__ As long as you do not tell `cbecho` to empty the clipboard, you
+> can chain the command to send its output to several files. Since `cbecho`
+> returns `0` (which in command shells means `no error`), chaining with `&&`
+> will run the whole chain if there is plain text on the clipboard, but will
+> quit after the first `cbecho` exits `1`, meaning there is no plain text on the
+> clipboard. For example,
+>
+> ```
+> C:\> cbecho file1.txt && cbecho file2.txt && cbecho -e
+> ```
+>
+> If there is plain text on the clipboard, this will write it to `file1.txt`,
+> then to `file2.txt`, then send it to `stdout` and finally empty the clipboard
+> (because of the `-e` switch described somewhat below).
 
 Unlike other operating systems, Windows can treat files as either binary or
 text files. I noticed that if I send the output of `cbecho` to a text file,
