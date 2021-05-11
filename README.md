@@ -120,8 +120,8 @@ C:\> cbecho /?
 C:\> cbecho --help
 ```
 
-That will list all of its command line switches, just as shown above. If you
-have the `CBECHO` environment variable set, it will list that as well.
+That will list all of its command line switches, [just as shown above](#cbecho).
+If you have the `CBECHO` environment variable set, it will list that as well.
 
 If you just need to know what version of `cbecho` you have, you can type one
 of these two,
@@ -132,6 +132,8 @@ C:\> cbecho --version
 ```
 
 ### The options
+
+#### Output length
 
 By default, `cbecho` will print the text just as it is stored on the clipboard.
 Some Windows programs append an extra carriage return and line feed to the text
@@ -179,6 +181,8 @@ simple text. By default, `cbecho` first checks if any Unicode text is on the
 clipboard. Only if it does not find Unicode, will it check for ANSI text and
 simple text.
 
+#### Bypassing Unicode
+
 You can instruct `cbecho` to bypass the Unicode text and go straight to looking
 for ANSI text or simple text like this,
 
@@ -193,6 +197,8 @@ C:\> cbecho -U
 ```
 
 That is the _capital_ leter `U`.
+
+#### Output destination
 
 By default, `cbecho` writes its output to `stdout`. You can instruct it to
 write to a file instead. Assuming the file name is called `myfile.txt`, any
@@ -243,6 +249,8 @@ the fourth case, it will send its output to the file called `-Universe.txt`.
 > then to `file2.txt`, then send it to `stdout` and finally empty the clipboard
 > (because of the `-e` switch described somewhat below).
 
+#### Output file types
+
 Unlike other operating systems, Windows can treat files as either binary or
 text files. I noticed that if I send the output of `cbecho` to a text file,
 it is a plain non-Unicode file even if the text comes from the clipboard in
@@ -264,6 +272,8 @@ as ANSI (again, hopefully),
 ```
 C:\> cbecho -a filename.txt
 ```
+
+#### Clearing the clipboard
 
 Last but not least, by default `cbecho` leaves the data on the clipboard
 even after reading it. But you can ask it to empty the clipboard after it
