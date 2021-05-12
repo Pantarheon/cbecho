@@ -1,5 +1,7 @@
 # CBECHO
 
+![cbecho logo](./media/cbecho.png)
+
 ``` /bin/sh
 C:\> cbecho --help
 CBECHO version 1.0
