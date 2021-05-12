@@ -293,8 +293,8 @@ C:\> cbecho -w
 
 The `-k` option tells `cbecho` to `keep` the data on the clipboard. The `-e`
 option will `empty` the clipboard after potentially sending any plain text from
-it to `stdout`. And the `-w` option will `wipe` the clipboard without any
-output.
+it to `stdout`. And the `-w` option will `wipe` the clipboard without showing
+any output.
 
 Both `-e` and `-w` will leave the clipboard equally empty. The only difference
 is that `-e` will first check if there is some plain text on the clipboard
@@ -361,6 +361,10 @@ This is a very simple program entirely contained in the small `cbecho.exe`
 file. No need to install it, no need to uninstall it. Just download it and
 place it in a folder listed in the `PATH` environment variable. Then you
 can use it from the command line as well as from batch files.
+
+The enclosed `cbecho.exe` was compiled for 32-bit Windows, so it works under
+both, 32-bit and 64-bit, versions of Windows (though if you expect more than
+2GB of text on the clipboard, you would need to recompile for 64-bit Windows).
 
 ## License
 
