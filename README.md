@@ -2,28 +2,37 @@
 
 ![cbecho logo](./media/cbecho.png)
 
-``` /bin/sh
+```
 C:\> cbecho --help
-CBECHO version 1.0
+CBECHO version 1.0a
 Copyright 2021 G. Adam Stanislav
 All rights reserved
 
 Usage: cbecho [options] [file]
 
-	cbecho -# (strips off # number characters)
-	cbecho -U (tries Unicode first)*
-	cbecho -a [-o] file (will save file in ANSI)
-	cbecho -b (bypasses Unicode)
-	cbecho -h (returns this message)
-	cbecho -e (empties the clipboard after output)
-	cbecho -k (does not empty the clipboard)*
-	cbecho -o file (sends the output to the file)
-	cbecho -u [-o] file (may save in Unicode)*
-	cbecho -v (prints the version)
-	cbecho -w (wipes the clipboard)
+	cbecho -# (strip off # number characters)
+	cbecho -B (insert BE BOM)
+	cbecho -C (do not convert Unicode to UTF-8)*
+	cbecho -L (insert LE BOM)
+	cbecho -O file (append the output to the file)
+	cbecho -P (preserve BOM)*
+	cbecho -R (remove BOM)
+	cbecho -U (try Unicode first)*
+	cbecho -a [-o] file (save file in ANSI)
+	cbecho -b (bypass Unicode)
+	cbecho -c (convert Unicode to UTF-8)
+	cbecho -e (empty the clipboard after output)
+	cbecho -h (return this message)
+	cbecho -k (do not empty the clipboard)*
+	cbecho -n (do not swap Unicode bytes)*
+	cbecho -o file (send the output to the file)
+	cbecho -s (swap Unicode bytes)
+	cbecho -u [-o] file (save in Unicode if available)*
+	cbecho -v (print the version)
+	cbecho -w (wipe the clipboard)
 
 	* marks the default setting.
-	If the last argument is just -o, the output is stdout.
+	If the last argument is just -o or -O, the output is stdout.
 	Because this is Windows, you can use / instead of -.
 C:\>
 ```
