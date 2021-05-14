@@ -53,7 +53,7 @@ the output goes. It is even possible to pipe `stdout` of one `CLI` program
 to `stdin` of another `CLI` program by typing a vertical bar (`|`) between
 their names.
 
-> __A tip:__ Some people talk about `DOS` programs when they actually mean
+> __HINT:__ Some people talk about `DOS` programs when they actually mean
 > Windows `CLI` programs. This is because the early versions of MS Windows
 > ran on top of `MS DOS` (Microsoft Disk Operating System), and its command
 > line window was designed to run `CLI` software written for `MS DOS`.
@@ -108,7 +108,7 @@ Much simpler and much faster!
 Between `clip` and `cbecho`, the bridge between `GUI` and `CLI` software
 is now complete.
 
-> __A tip:__ If you wanted to copy the output of the `dir` command to
+> __HINT:__ If you wanted to copy the output of the `dir` command to
 > the clipboard, but still see it in your command line window, try this,
 >
 > ```
@@ -184,7 +184,10 @@ C:\> cbecho -17 -b -2147483647 -U -0
 ```
 
 None of them will be stripped because the zero switch appears after the
-other numeric switches (also the `-U` cancels out the `-b`, as shown next).
+other numeric switches \(also the `-U` cancels out the `-b`,
+[as shown below](#bypassing-unicode)\).
+
+#### Working with Unicode
 
 Windows allows programs to copy all kinds of data to the clipboard, not just
 plain text. Even with the plain text, it can be Unicode text, ANSI text, or
@@ -192,22 +195,132 @@ simple text. By default, `cbecho` first checks if any Unicode text is on the
 clipboard. Only if it does not find Unicode, will it check for ANSI text and
 simple text.
 
-#### Bypassing Unicode
+Now, Unicode is simply a list of various characters with a unique number
+assigned to each. Originally, all those numbers could be expressed as 16-bit
+data. Microsoft Windows was one of the early adopters of Unicode, so when we
+are talking about “Unicode” in Windows context, we specifically mean that
+16-bit implementation.
 
-You can instruct `cbecho` to bypass the Unicode text and go straight to looking
-for ANSI text or simple text like this,
+Additionally, in different types of computer architecture, 16 bits is
+represented differently. They typically store 16 bits in two adjacent 8-bit
+bytes. But some of them, called low-endian (`LE`), store the lower 8 of the 16
+bits before the bigger 8 of the 16 bits. Others, called big-endian (`BE`), store
+the bigger 8 bits before the lower 8 bits.
+
+##### Bypassing Unicode
+
+You can avoid all that by instructing `cbecho` to bypass the Unicode text
+and go straight to looking for ANSI text or simple text like this,
 
 ```
 C:\> cbecho -b 
 ```
 
-And you can tell it to search for Unicode text first after all like this,
+You can also tell it to search for Unicode text first after all like this,
 
 ```
 C:\> cbecho -U
 ```
 
 That is the _capital_ leter `U`.
+
+##### The byte order
+
+Windows runs mostly on Intel microprocessors, which use the `LE` architecture.
+So, when some text is present on Windows clipboard as Unicode, individual
+characters (and other Unicode values) are stored as low-end-byte-first 16-bit
+values. As long as we are passing Unicode text among various Windows processes,
+this presents no problem.
+
+Once, however, we store such text in a file that may be shared with software
+running on a different system, we need to make it clear that the data is `LE`.
+Or perhaps even swap the two bytes of each 16-bit value and make it clear the file is `BE`.
+
+###### The byte swap
+
+If you need to swap the two bytes in each 16-bit Unicode value, use
+
+```
+C:\> cbecho -s
+```
+
+Now the data that was `LE` is `BE`. Of course, if for some reason the
+clipboard Unicode data was `BE`, now it will be `LE`.
+
+And to explicitly state you do not wish the byte swap, use,
+
+```
+C:\> cbecho -n
+```
+
+That is the default anyway \(unless your [system preferences](#preferences)
+say otherwise\).
+
+###### The BOM
+
+To indicate whether the 16-bit Unicode data is stored in a file as `LE` or
+`BE`, such a file usually starts with the _byte-order mark,_ or `BOM`. Its
+hexadecimal value is `FEFF`. That means that in a file with a `BOM`, the first
+byte is `FE` and the second byte `FF` if it contains `BE` Unicode text; while
+the first byte is `FF` and the second byte `FE` if it contains `LE` Unicode
+text (such as normally produced by Windows software).
+
+There are four different mutually exclusive switches for dealing with a `BOM`
+in `cbecho`.
+
+```
+C:\> cbecho -B
+C:\> cbecho -L
+C:\> cbecho -P
+C:\> cbecho -R
+```
+
+The `-B` switch will make sure the 16-bit Unicode output is preceded by a
+`BE BOM`. The `-L` switch will make sure the 16-bit Unicode output is preceded
+by an `LE BOM`. The `-P` switch will _preserve_ a `BOM` if it already is
+present at the start of the 16-bit Unicode text read from the clipboard, but
+will not add one on its own (though it will swap its bytes if the `-s` switch
+is also active). Finally, the `-R` switch will remove any `BOM` the 16-bit
+Unicode text may be started with.
+
+Remember, you usually want a `BOM` if you are saving a 16-bit Unicode text in
+a file. And you usually do _not_ want a `BOM` in other cases. But it is your
+choice, as I cannot foresee every possible use of `cbecho`.
+
+##### UTF-8
+
+A very common way of encoding Unicode is `UTF-8`. It uses a variable number
+of bytes. Its size is smaller than the two-byte 16-bit Windows version for
+European languages, but generally larger for Chinese script and similar.
+
+However, perhaps its main advantage is the ability to encode Unicode values
+that are too large for 16 bits.
+
+```
+C:\> cbecho -c
+```
+
+This switch tells `cbecho` to convert any 16-bit Unicode from the clipboard
+into `UTF-8`. By default it will not start such converted text with a `BOM` as
+it is usually not required but may confuse some software. You can, however,
+force `cbecho` to start with a `UTF-8 BOM` by using either the `-B` or the
+`-L` switch. It does not matter which one of the two.
+
+```
+C:\> cbecho -C
+```
+
+This option (that is the capital `C`) tells `cbecho` _not_ to convert to
+`UTF-8`. Also, if there is no Unicode text on the clipboard (or there is, but
+you use the `-b` switch to _bypass_ Unicode), no conversion and no `BOM`
+will take place.
+
+> __HINT:__ You can use the `-s` switch and the `-c` switch on the same
+> command line. That will _swap_ the two 16-bit Unicode bytes before
+> _converting_ them to `UTF-8`.
+>
+> Normally you would only do this if for some reason some software is sending
+> `BE` 16-bit Unicode to the clipboard. But there are exceptions to every rule.
 
 #### Output destination
 
@@ -219,6 +332,8 @@ of these will tell `cbecho` to write to it,
 C:\> cbecho -o myfile.txt
 C:\> cbecho -omyfile.txt
 C:\> cbecho myfile.txt
+C:\> cbecho -O myfile.txt
+C:\> cbecho -O myfile.txt
 ```
 
 The `-o` switch is optional there. If, however, `-o` is the _last_ switch on
@@ -245,7 +360,12 @@ to `-Xantipa.txt`. In the third case, it will assume you meant `-U`, so it
 will read the Unicode text from the clipboard and write it to `stdout`. In
 the fourth case, it will send its output to the file called `-Universe.txt`.
 
-> __A tip:__ As long as you do not tell `cbecho` to empty the clipboard, you
+Both `-o` and `-O` are used to select the output file. In either case, if the
+file does not exist, `cbecho` will created. If, however, the file exists
+already, `-o` will delete it and create a new file by that name, while `-O`
+will append the output of `cbecho` to the existing file.
+
+> __HINT:__ As long as you do not tell `cbecho` to empty the clipboard, you
 > can chain the command to send its output to several files. Since `cbecho`
 > returns `0` (which in command shells means `no error`), chaining with `&&`
 > will run the whole chain if there is plain text on the clipboard, but will
@@ -311,7 +431,7 @@ Both `-e` and `-w` will leave the clipboard equally empty. The only difference
 is that `-e` will first check if there is some plain text on the clipboard
 and, if so, will output it.
 
-> __A tip:__ The `-e` option will empty the clipboard after first checking
+> __HINT:__ The `-e` option will empty the clipboard after first checking
 > for plain text so it can display it if present. But it will still empty
 > the clipboard even if it does not find any plain text on it.
 >
