@@ -333,7 +333,7 @@ C:\> cbecho -o myfile.txt
 C:\> cbecho -omyfile.txt
 C:\> cbecho myfile.txt
 C:\> cbecho -O myfile.txt
-C:\> cbecho -O myfile.txt
+C:\> cbecho -Omyfile.txt
 ```
 
 The `-o` switch is optional there. If, however, `-o` is the _last_ switch on
