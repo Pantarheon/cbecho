@@ -100,7 +100,7 @@ text present in Windows clipboard to its `stdout`. Now I can just
 copy the text, but instead of using a temp file, I type something like this,
 
 ```
-C:\> cbecho | program1 | program2 | program3 | clip
+C:\> cbecho -b | program1 | program2 | program3 | clip
 ```
 
 Much simpler and much faster!
@@ -213,7 +213,7 @@ You can avoid all that by instructing `cbecho` to bypass the Unicode text
 and go straight to looking for ANSI text or simple text like this,
 
 ```
-C:\> cbecho -b 
+C:\> cbecho -b
 ```
 
 You can also tell it to search for Unicode text first after all like this,
@@ -223,6 +223,9 @@ C:\> cbecho -U
 ```
 
 That is the _capital_ leter `U`.
+
+> __HINT:__ When piping `cbecho` output to a non-Unicode `CLI` program,
+> you should always use either the `-b` switch or the [`-c` switch](#utf-8).
 
 ##### The byte order
 
