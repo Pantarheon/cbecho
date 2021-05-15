@@ -4,7 +4,7 @@
 
 ```
 C:\> cbecho --help
-CBECHO version 1.0a
+CBECHO version 1.10
 Copyright 2021 G. Adam Stanislav
 All rights reserved
 
@@ -18,7 +18,7 @@ Usage: cbecho [options] [file]
 	cbecho -P (preserve BOM)*
 	cbecho -R (remove BOM)
 	cbecho -U (try Unicode first)*
-	cbecho -a [-o] file (save file in ANSI)
+	cbecho -a [[-o] file] (ANSI/text output)
 	cbecho -b (bypass Unicode)
 	cbecho -c (convert Unicode to UTF-8)
 	cbecho -e (empty the clipboard after output)
@@ -27,7 +27,7 @@ Usage: cbecho [options] [file]
 	cbecho -n (do not swap Unicode bytes)*
 	cbecho -o file (send the output to the file)
 	cbecho -s (swap Unicode bytes)
-	cbecho -u [-o] file (save in Unicode if available)*
+	cbecho -u [[-o] file] (Unicode/binary output if available)*
 	cbecho -v (print the version)
 	cbecho -w (wipe the clipboard)
 
@@ -58,7 +58,7 @@ their names.
 > ran on top of `MS DOS` (Microsoft Disk Operating System), and its command
 > line window was designed to run `CLI` software written for `MS DOS`.
 >
-> But for decades now the `CLI` programs written for Windows command line
+> But for decades now most `CLI` programs written for Windows command line
 > no longer are `MS DOS` programs and should not be called `DOS` programs
 > because most people will assume they are talking about the old 20th Century
 > programs. So unless you want to confuse people, call them comand line
@@ -351,17 +351,19 @@ four possibilities
 C:\> cbecho -Xantipa.txt
 C:\> cbecho -o -Xantipa.txt
 C:\> cbecho -Universe.txt
-C:\> cbecho -o -Universe.txt
+C:\> cbecho -O -Universe.txt
 ```
 
 The first one will make `cbecho` assume it is meant to be the `-X` switch,
 so it will consider it an error. In the second case, it will send its output
 to `-Xantipa.txt`. In the third case, it will assume you meant `-U`, so it
-will read the Unicode text from the clipboard and write it to `stdout`. In
-the fourth case, it will send its output to the file called `-Universe.txt`.
+will be set to read the Unicode text from the clipboard and write it to
+`stdout`, then it will take the `n` as a request not to _swap_ Unicode bytes,
+but once it sees the `i`, it will consider that an error. In the fourth case,
+it will _append_ its output to the file called `-Universe.txt`.
 
 Both `-o` and `-O` are used to select the output file. In either case, if the
-file does not exist, `cbecho` will created. If, however, the file exists
+file does not exist, `cbecho` will create it. If, however, the file exists
 already, `-o` will delete it and create a new file by that name, while `-O`
 will append the output of `cbecho` to the existing file.
 
@@ -394,15 +396,42 @@ By default, `cbecho` will treat the file as binary, so Unicode can remain
 Unicode (hopefully). This can also be requested explicitly,
 
 ```
-C:\> cbecho -u filename.txt
+C:\> cbecho -u [...] [filename.txt]
+C:\> cbecho [-o] filename.txt [...] -u
+C:\> cbecho -ufilename.txt
 ```
 
 But you can also request it to be treated as a text file, so Unicode is saved
 as ANSI (again, hopefully),
 
 ```
-C:\> cbecho -a filename.txt
+C:\> cbecho -a [...] [filename.txt]
+C:\> cbecho [-o] filename.txt [...] -a
+C:\> cbecho -afilename.txt
 ```
+
+> __HINT:__ The file name can be specified before or after the `-u` and `-a`
+> switches. It can also be appended directly to the switch as illustrated
+> by the third sample for either switch.
+>
+> It is even possible to use these switches without setting an output file.
+> In that case, in versions prior to 1.10, the switches had no effect on the
+> output, which just went to `stdout` in text mode.
+>
+> Starting with version 1.10, if neither switch is used, `stdout` will
+> default to _binary_ mode if the `-b` (_bypass_ Unicode) switch is used
+> or if there is no Unicode text on the clipboard. If no such switch is
+> used and there is Unicode text on the clipboard, it will be output to
+> `stdout` in the _Unicode text_ mode.
+>
+> If an output file _is_ specified, it behaves the same in all versions of
+> `cbecho`, i.e., the default is binary and the `-a` and `-u` switches will
+> override it.
+>
+> This is best illustrated with an image of the word _ninja_ in various
+> `stdout` output types:
+>
+> ![cbecho output types](./media/cbecho-outputs.png)
 
 #### Clearing the clipboard
 
@@ -457,6 +486,30 @@ and, if so, will output it.
 > C:\> cbecho NUL && cbecho -w
 > ```
 
+#### Chaining options
+
+If you need more than one option, you may be able to place them all into one
+switch. For example,
+
+```
+C:\> cbecho -comytext.txt
+```
+
+This will _convert_ the Unicode text into `UTF-8` and send them to the file
+named `mytext.txt` You can combine as many options that way.
+
+Just remember that if options `-o`, `-O`, `-a`, and `-u` are followed by
+anything within the same switch (as in the above example), `cbecho`
+interprets that as the name of the output file.
+
+For example, this will not give you the same result as the above,
+
+```
+C:>\ cbecho -omytext.txtc
+```
+
+That will just send the 16-bit Unicode text to a file named `mytext.txtc`,
+probably not what you intended.
 
 ### Preferences
 
@@ -467,8 +520,8 @@ by setting the `CBECHO` environment variable to any of the above options
 version, so adding them to the environment variable has no effect).
 
 You cannot specify a file name in the environment variable, only the options.
-So, the `o` option will only affirm `stdout` as the output and is, therefore,
-redundant, though you can use it if you want.
+So, the `o` and `O` options will only affirm `stdout` as the output and are,
+therefore, redundant, though you can use them if you want.
 
 There is no need to prepend the options in the environment variable with
 a dash. For example, this will result in bypassing Unicode, stripping two
