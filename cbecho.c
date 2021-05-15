@@ -1,3 +1,5 @@
+#include <fcntl.h>
+#include <io.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,7 +38,7 @@
 #define	ENVPREFS	"CBECHO="
 
 int version(int i) {
-	fprintf(i ? stderr : stdout, "CBECHO version 1.0a\n"
+	fprintf(i ? stderr : stdout, "CBECHO version 1.10\n"
 		"Copyright 2021 G. Adam Stanislav\nAll rights reserved\n");
 	return i;
 }
@@ -52,7 +54,7 @@ int usage(int i, char *prefs) {
 		"\tcbecho -P (preserve BOM)*\n"
 		"\tcbecho -R (remove BOM)\n"
 		"\tcbecho -U (try Unicode first)*\n"
-		"\tcbecho -a [-o] file (save file in ANSI)\n"
+		"\tcbecho -a [[-o] file] (ANSI/text output)\n"
 		"\tcbecho -b (bypass Unicode)\n"
 		"\tcbecho -c (convert Unicode to UTF-8)\n"
 		"\tcbecho -e (empty the clipboard after output)\n"
@@ -61,7 +63,7 @@ int usage(int i, char *prefs) {
 		"\tcbecho -n (do not swap Unicode bytes)*\n"
 		"\tcbecho -o file (send the output to the file)\n"
 		"\tcbecho -s (swap Unicode bytes)\n"
-		"\tcbecho -u [-o] file (save in Unicode if available)*\n"
+		"\tcbecho -u [[-o] file] (Unicode/binary output if available)*\n"
 		"\tcbecho -v (print the version)\n"
 		"\tcbecho -w (wipe the clipboard)\n"
 		"\n\t* marks the default setting."
@@ -97,7 +99,7 @@ int main(int argc, char *argv[], char **envp) {
 	char *mode;
 	char *prefs = NULL;
 	int n = 0;
-	int bin = 1;
+	int bin = -1;
 	int	app = 0;
 	int empty = 0;
 	int bypass = 0;
@@ -107,6 +109,8 @@ int main(int argc, char *argv[], char **envp) {
 	int rbom = 0;	// remove BOM
 	int convert = 0;	// to UTF-8
 	unsigned int i;
+
+	static char koniec = 0;
 
 	/* Parse the environment for user defaults */
 	for (;*envp;envp++) {
@@ -191,11 +195,24 @@ int main(int argc, char *argv[], char **envp) {
 		if (!strcmp(argv[i], "--help")) return usage(0, prefs);
 		else if (!strcmp(argv[i], "--version")) return version(0);
 		else if ((argv[i][0] == '/') || (argv[i][0] == '-')) {
-			if (isdigit(argv[i][1]))
-				n = atoi(&(argv[i][1]));
-			else switch (argv[i][1]) {
+			char *str = &(argv[i][1]);
+			if (*str == '\0') return usage(-2, prefs);
+			else for (; *str; str++) switch (*str) {
 				default:
 					return usage(-2, prefs);
+					break;
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				case '6':
+				case '7':
+				case '8':
+				case '9':
+					n = atoi(str);
+					while (isdigit(*str)) str++;
 					break;
 				case 'B':
 					bom  = 1;
@@ -210,7 +227,10 @@ int main(int argc, char *argv[], char **envp) {
 					break;
 				case 'O':
 					app = 1;
-					if (argv[i][2]) filename = &argv[i][2];
+					if (str[1]) {
+						filename = &str[1];
+						str = &koniec;
+					}
 					else if (i < argc-1) filename = argv[++i];
 					else filename = NULL;
 					break;
@@ -226,7 +246,10 @@ int main(int argc, char *argv[], char **envp) {
 					break;
 				case 'a':
 					bin = 0;
-					if (argv[i][2]) filename = &argv[i][2];
+					if (str[1]) {
+						filename = &(str[1]);
+						str = &koniec;
+					}
 					break;
 				case 'b':
 					bypass = 1;
@@ -249,7 +272,10 @@ int main(int argc, char *argv[], char **envp) {
 					break;
 				case 'o':
 					app = 0;
-					if (argv[i][2]) filename = &argv[i][2];
+					if (str[1]) {
+						filename = &(str[1]);
+						str = &koniec;
+					}
 					else if (i < argc-1) filename = argv[++i];
 					else filename = NULL;
 					break;
@@ -258,7 +284,10 @@ int main(int argc, char *argv[], char **envp) {
 					break;
 				case 'u':
 					bin = 1;
-					if (argv[i][2]) filename = &argv[i][2];
+					if (str[1]) {
+						filename = &(str[1]);
+						str = &koniec;
+					}
 					break;
 				case 'v':
 					return version(0);
@@ -275,13 +304,16 @@ int main(int argc, char *argv[], char **envp) {
 
 	if (empty < 0) filename = NULL;
 
-	if (filename == NULL) output = stdout;
+	if (filename == NULL) {
+		if (bin > 0) _setmode(_fileno(stdout), _O_BINARY);
+		output = stdout;
+	}
 	else {
 		if (app) mode = (bin) ? "ab" : "at";
 		else mode = (bin) ? "wb" : "wt";
 		if ((output = fopen(filename, mode)) == NULL) {
-			fprintf(stderr, "Could not create file %s\n", filename);
-			return usage(-3, prefs);
+			fprintf(stderr, "cbecho: Could not create file '%s'.\n", filename);
+			return -3;
 		}
 	}
 
@@ -311,6 +343,8 @@ int main(int argc, char *argv[], char **envp) {
 						}
 					}
 					else {
+						if ((filename == NULL) && (bin <= 0))
+							_setmode(_fileno(stdout), _O_U16TEXT);
 						if (bom)
 							// Windows is low-endian, so when we pass FEFF,
 							// it will output FF followed by FE, and vice versa.
